@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="icon" href="data:;base64,iVBORw0KGgo=">
+<title>Test Audio</title>
+<script type="text/javascript" src="audios.js"></script>
+<script type="text/javascript">
+
+	// play audio
+	var playaudio=(playlist)=>{
+		let idx = 0; // initial array index to play sound
+		let audio = new Audio(); // create new audio object
+		audio.loop = false;
+		audio.addEventListener('ended', function () { // this event fire when audio has been played
+			idx++;
+			if(idx<playlist.length){
+				audio.defaultPlaybackRate = playlist[idx].speed;
+				audio.src = playlist[idx].src;
+				audio.play();
+			}
+		},true);
+		
+		if(playlist.length>0){
+			audio.defaultPlaybackRate = playlist[idx].speed;
+			audio.src = playlist[idx].src;
+			audio.play();
+		}
+	}
+
+	// get number playlist
+	var getaudionumber=(num,speed)=>{
+		num = num.replace(/\D/g,''); // remove non numeric character
+		let arr = num.split(''); // split each digit to array 'arr'
+		
+		let pl = [];
+		
+		if(arr.length>0){ // prepare playlist
+			for(var i=0;i<arr.length;i++){
+				pl.push({src:audios['n' + arr[i]],speed:speed});
+			}
+		}
+		return pl;
+	}
+	
+	var pta = ['','sib','roi','pan','muon','san','ran'];
+	
+	var getaudiosib=(num,speed)=>{ // ประมวลผลหลักสิบและหลักหน่วย
+		var pl = [];
+		if(num<10){
+			pl.push({src:audios['n' + num],speed:speed});
+		}else{
+			var dv = Math.floor(num/10);
+			num %= 10;
+			switch(dv){
+				case 0:
+					break;
+				case 1:
+					pl.push({src:audios['sib'],speed:speed});
+					break;
+				case 2:
+					pl.push({src:audios['ye'],speed:speed+0.5});
+					pl.push({src:audios['sib'],speed:speed+0.5});
+					break;
+				default:
+					pl.push({src:audios['n' + dv],speed:speed+0.5});
+					pl.push({src:audios['sib'],speed:speed+0.5});
+					break;
+			}
+			if(num>0){
+				if(num==1){
+					pl.push({src:audios['edd'],speed:speed});
+				}else{
+					pl.push({src:audios['n' + num],speed:speed});
+				}
+			}
+		}
+		return pl;
+	}
+	
+	// get amount playlist
+	var getaudioamount=(num,speed)=>{
+		var log10 = 0;
+		var pl = [];
+		
+		if(num>0){
+			log10 = Math.floor(Math.log10(num));
+			
+			if(log10>5){
+				var p10 = Math.pow(10,6);
+				var dv = Math.floor(num/p10);
+				pl = getaudioamount(dv,speed);
+				pl.push({src:audios[pta[6]],speed:speed});
+				num %= p10;
+				pl = pl.concat(getaudioamount(num,speed));
+			}else if(log10<2){
+				pl = getaudiosib(num,speed);
+			}else{
+				var p10 = Math.pow(10,log10);
+				var dv = Math.floor(num/p10);
+				if(dv>0){
+					pl.push({src:audios['n' + dv],speed:speed});
+					pl.push({src:audios[pta[log10]],speed:speed});
+				}
+				num %= p10;
+				pl = pl.concat(getaudioamount(num,speed));
+			}
+		}
+				
+		return pl;
+	}
+	
+	var play=()=>{
+		var playlist = [];
+		var number = document.getElementById('txtNum').value.replace(/[^?0-9]/g,'');
+		var At = document.getElementById('txtAt').value.replace(/[^?0-9]/g,'');
+		
+		// เชิญหมายเลข
+		playlist.push({src:audios['number'],speed:1.3});
+		
+		// หนึ่งสองสาม
+		playlist = playlist.concat(getaudionumber(number,1.2));
+		
+		// ที่ช่อง
+		playlist.push({src:audios['at'],speed:1.2});
+		
+		if(/^\d*$/.test(At)){
+			playlist = playlist.concat(getaudioamount(At,1.5));
+		}
+		
+		// ค่ะ
+		playlist.push({src:audios['ka'],speed:1.3});
+		playaudio(playlist);
+	}
+	
+</script>
+
+</head>
+<body>
+	เชิญหมายเลข :
+	<input type="text" id="txtNum" value="123" /><br />
+	ที่ช่อง :
+	<input type="text" id="txtAt" value="75495321" /><br />
+	<button onclick="javascript:play()">test</button>
+</body>
+</html>
