@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <link rel="icon" href="data:;base64,iVBORw0KGgo=">
-<title>Test Audio</title>
-<script type="text/javascript" src="audios.js"></script>
+<title>Audio Thai service</title>
+<script type="text/javascript" src="audios.js?version2"></script>
 <script type="text/javascript">
 
 	// play audio
@@ -119,14 +119,16 @@
 		playlist.push({src:audios['number'],speed:1.3});
 		
 		// หนึ่งสองสาม
-		playlist = playlist.concat(getaudionumber(number,1.2));
-		
+		playlist = playlist.concat(getaudioamount(number,1.1));
+		// getaudionumber
 		// ที่ช่อง
 		playlist.push({src:audios['at'],speed:1.2});
+		playlist.push({src:audios['service'],speed:1.2});
 		
 		if(/^\d*$/.test(At)){
-			playlist = playlist.concat(getaudioamount(At,1.5));
+			playlist = playlist.concat(getaudionumber(At,1.5));
 		}
+		//getaudioamount
 		
 		// ค่ะ
 		playlist.push({src:audios['ka'],speed:1.3});
@@ -137,10 +139,11 @@
 
 </head>
 <body>
+
 	เชิญหมายเลข :
 	<input type="text" id="txtNum" value="123" /><br />
-	ที่ช่อง :
-	<input type="text" id="txtAt" value="75495321" /><br />
+	ที่ช่อง บริการ:
+	<input type="text" id="txtAt" value="3" /><br />
 	<button onclick="javascript:play()">test</button>
 </body>
 </html>
